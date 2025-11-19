@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Tracker</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9ff;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #6a5acd;
+        }
+
+        /* Form Styles */
+        form {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        input, select, button {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: #6a5acd;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #836fff;
+        }
+
+        /* Transaction List */
+        .transactions {
+            list-style: none;
+            padding: 0;
+        }
+
+        .transaction {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            background-color: #f0f8ff;
+        }
+
+        .transaction.income {
+            border-left: 5px solid #6a5acd;
+        }
+
+        .transaction.expense {
+            border-left: 5px solid #ff6f61;
+        }
+
+        .delete-btn {
+            background-color: #ff6f61;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 5px 10px;
+            cursor: pointer;
+        }
+
+        .delete-btn:hover {
+            background-color: #ff8a75;
+        }
+
+        /* Balance Section */
+        .balance {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.5rem;
+            color: #6a5acd;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            form {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>Finance Tracker</h1>
+
+        <!-- Form to Add Transactions -->
+        <form id="transaction-form">
+            <input type="text" id="title" placeholder="Title" required>
+            <input type="number" id="amount" placeholder="Amount" required>
+            <select id="type">
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+            </select>
+            <button type="submit">Add</button>
+        </form>
+
+        <!-- Transactions List -->
+        <ul class="transactions" id="transactions"></ul>
+
+        <!-- Total Balance -->
+        <div class="balance" id="balance">Total Balance: $0</div>
+    </div>
+
+    <script>
+        // Select elements
+        const transactionForm = document.getElementById('transaction-form');
+        const transactionsList = document.getElementById('transactions');
+        const balanceDisplay = document.getElementById('balance');
+
+        let transactions = []; // Array to store transactions
+
+        // Function to update the balance
+        function updateBalance() {
+            const total = transactions.reduce((acc, transaction) => {
+                return transaction.type === 'income' ? acc + transaction.amount : acc - transaction.amount;
+            }, 0);
+
+            balanceDisplay.textContent = `Total Balance: $${total.toFixed(2)}`;
+        }
+
+        // Function to render transactions
+        function renderTransactions() {
+            transactionsList.innerHTML = ''; // Clear the list
+
+            transactions.forEach((transaction, index) => {
+                const li = document.createElement('li');
+                li.classList.add('transaction', transaction.type);
+
+                li.innerHTML = `
+                    <span>${transaction.title} - $${transaction.amount.toFixed(2)}</span>
+                    <button class="delete-btn" data-index="${index}">Delete</button>
+                `;
+
+                transactionsList.appendChild(li);
+            });
+        }
+
+        // Function to handle form submission
+        transactionForm.addEventListener('submit', (e) => {
+            e.preventDefault();
+
+            const title = document.getElementById('title').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const type = document.getElementById('type').value;
+
+            if (title && amount && !isNaN(amount)) {
+                transactions.push({ title, amount, type });
+                renderTransactions();
+                updateBalance();
+
+                // Clear form inputs
+                transactionForm.reset();
+            }
+        });
+
+        // Function to handle delete
+        transactionsList.addEventListener('click', (e) => {
+            if (e.target.classList.contains('delete-btn')) {
+                const index = e.target.getAttribute('data-index');
+                transactions.splice(index, 1);
+                renderTransactions();
+                updateBalance();
+            }
+        });
+    </script>
+</body>
+</html>

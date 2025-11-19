@@ -1,177 +1,162 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Finance Tracker</title>
-  <style>
-    :root{
-      --pastel-purple:#b39ddb;
-      --pastel-blue:#90caf9;
-      --white:#fff;
-      --text-dark:#2d2d2d;
-      --text-light:#6d6d6d;
-    }
-    body{
-      background:linear-gradient(135deg,var(--pastel-blue) 0%,var(--pastel-purple)100%);
-      min-height:100vh;margin:0;font-family:'Segoe UI',Arial,sans-serif;
-      display:flex;align-items:center;justify-content:center;
-    }
-    .tracker-container{
-      background:var(--white);border-radius:18px;
-      box-shadow:0 4px 24px rgba(179,157,219,0.12);
-      padding:2rem 1.5rem 1.5rem;width:100%;max-width:370px;margin:2rem 1rem;box-sizing:border-box;
-    }
-    h1{text-align:center;color:var(--pastel-purple);margin-bottom:1.2rem;font-size:2rem;}
-    .balance{text-align:center;font-size:2rem;color:var(--text-dark);margin-bottom:1rem;}
-    .summary{display:flex;justify-content:space-between;margin-bottom:1.2rem;}
-    .summary div{background:var(--pastel-blue);border-radius:8px;padding:0.4rem 0.8rem;color:var(--text-dark);font-weight:500;font-size:1rem;}
-    form{display:flex;flex-wrap:wrap;gap:0.5rem;margin-bottom:1.2rem;justify-content:space-between;}
-    label{display:none}
-    form input, form select{flex:1 1 100%;min-width:0;padding:0.5rem;border:1px solid var(--pastel-purple);border-radius:6px;font-size:1rem;margin-bottom:0.5rem;box-sizing:border-box;}
-    form select{flex:1 1 48%;}
-    form button{flex:1 1 48%;background:var(--pastel-purple);color:var(--white);border:none;border-radius:6px;padding:0.5rem 1rem;font-size:1rem;cursor:pointer;transition:background 0.2s;}
-    form button:hover{background:#9575cd;}
-    .transactions{margin-top:1rem;}
-    .transactions ul{list-style:none;padding:0;margin:0;}
-    .transactions li{display:flex;justify-content:space-between;align-items:center;background:#f3f0fa;border-radius:6px;margin-bottom:0.5rem;padding:0.5rem 0.75rem;font-size:1rem;color:var(--text-dark);}
-    .transactions .income{color:#388e3c;}
-    .transactions .expense{color:#d32f2f;}
-    .delete-btn{background:none;border:none;color:#bdbdbd;font-size:1.2rem;cursor:pointer;margin-left:0.5rem;transition:color 0.2s;}
-    .delete-btn:hover{color:#d32f2f;}
-    @media (max-width:500px){
-      .tracker-container{padding:1rem 0.5rem 1rem 0.5rem;max-width:98vw;}
-      h1{font-size:1.3rem;}
-      .balance{font-size:1.3rem;}
-    }
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Finance Tracker</title>
+    <style>
+        /* General Styles */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f9f9ff;
+            color: #333;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 20px auto;
+            padding: 20px;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #6a5acd;
+        }
+
+        /* Form Styles */
+        form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        input, select, button {
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: #6a5acd;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #836fff;
+        }
+
+        /* Transaction List */
+        .transactions {
+            margin-top: 20px;
+        }
+
+        .transaction {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        .transaction.income {
+            color: #32cd32;
+        }
+
+        .transaction.expense {
+            color: #ff4500;
+        }
+
+        .balance {
+            text-align: center;
+            margin-top: 20px;
+            font-size: 1.5rem;
+            color: #6a5acd;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 600px) {
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
 </head>
 <body>
-  <div class="tracker-container" aria-live="polite">
-    <h1>Finance Tracker</h1>
+    <div class="container">
+        <h1>Finance Tracker</h1>
+        <form id="transaction-form">
+            <input type="text" id="title" placeholder="Title" required>
+            <input type="number" id="amount" placeholder="Amount" required>
+            <select id="type">
+                <option value="income">Income</option>
+                <option value="expense">Expense</option>
+            </select>
+            <button type="submit">Add Transaction</button>
+        </form>
 
-    <!-- Display the current balance -->
-    <div class="balance" id="balance">$0.00</div>
-
-    <!-- Show total income and expense -->
-    <div class="summary" role="region" aria-label="summary">
-      <div>Income: <span id="income">$0.00</span></div>
-      <div>Expense: <span id="expense">$0.00</span></div>
+        <div class="transactions" id="transactions"></div>
+        <div class="balance" id="balance">Total Balance: $0</div>
     </div>
 
-    <!-- Form to add new transaction -->
-    <form id="transaction-form" autocomplete="off" aria-label="Add transaction">
-      <label for="title">Title</label>
-      <input type="text" id="title" placeholder="Title" required />
-      <label for="amount">Amount</label>
-      <input type="number" id="amount" placeholder="Amount" step="0.01" min="0.01" required />
-      <select id="type" aria-label="type">
-        <option value="income">Income</option>
-        <option value="expense">Expense</option>
-      </select>
-      <button type="submit">Add</button>
-    </form>
+    <script>
+        // JavaScript for Finance Tracker
+        const form = document.getElementById('transaction-form');
+        const transactionsDiv = document.getElementById('transactions');
+        const balanceDiv = document.getElementById('balance');
 
-    <!-- List of transactions -->
-    <div class="transactions">
-      <ul id="transaction-list"></ul>
-    </div>
-  </div>
+        let transactions = [];
 
-  <script>
-    // DOM references
-    const form = document.getElementById('transaction-form');
-    const titleInput = document.getElementById('title');
-    const amountInput = document.getElementById('amount');
-    const typeInput = document.getElementById('type');
-    const list = document.getElementById('transaction-list');
-    const balanceEl = document.getElementById('balance');
-    const incomeEl = document.getElementById('income');
-    const expenseEl = document.getElementById('expense');
+        // Function to update the balance
+        function updateBalance() {
+            const total = transactions.reduce((acc, transaction) => {
+                return transaction.type === 'income' ? acc + transaction.amount : acc - transaction.amount;
+            }, 0);
 
-    // try to load saved transactions from localStorage
-    let transactions = JSON.parse(localStorage.getItem('transactions') || '[]');
+            balanceDiv.textContent = `Total Balance: $${total.toFixed(2)}`;
+        }
 
-    // Format currency (keeps $ as original)
-    function formatCurrency(value){
-      // use Intl.NumberFormat for reliable formatting
-      return new Intl.NumberFormat('en-US', { style: 'currency', currency: 'USD', minimumFractionDigits: 2 }).format(value);
-    }
+        // Function to render transactions
+        function renderTransactions() {
+            transactionsDiv.innerHTML = '';
+            transactions.forEach((transaction, index) => {
+                const transactionDiv = document.createElement('div');
+                transactionDiv.classList.add('transaction', transaction.type);
+                transactionDiv.innerHTML = `
+                    <span>${transaction.title} - $${transaction.amount.toFixed(2)}</span>
+                    <button onclick="deleteTransaction(${index})">Delete</button>
+                `;
+                transactionsDiv.appendChild(transactionDiv);
+            });
+        }
 
-    // Update UI with transactions and totals
-    function updateUI(){
-      list.innerHTML = '';
-      let income = 0, expense = 0;
+        // Function to delete a transaction
+        function deleteTransaction(index) {
+            transactions.splice(index, 1);
+            renderTransactions();
+            updateBalance();
+        }
 
-      transactions.forEach((t, idx) => {
-        const li = document.createElement('li');
+        // Handle form submission
+        form.addEventListener('submit', (e) => {
+            e.preventDefault();
 
-        // amount display: show + or - sign then formatted currency
-        const sign = t.type === 'income' ? '+' : '-';
-        const amountHtml = <span class="${t.type}">${sign}${formatCurrency(Math.abs(t.amount))}</span>;
+            const title = document.getElementById('title').value;
+            const amount = parseFloat(document.getElementById('amount').value);
+            const type = document.getElementById('type').value;
 
-        li.innerHTML = `
-          <span>${escapeHtml(t.title)}</span>
-          <span>
-            ${amountHtml}
-            <button class="delete-btn" type="button" title="Delete" data-idx="${idx}">&times;</button>
-          </span>
-        `;
-        list.appendChild(li);
+            transactions.push({ title, amount, type });
 
-        if (t.type === 'income') income += t.amount;
-        else expense += t.amount;
-      });
+            renderTransactions();
+            updateBalance();
 
-      const balance = income - expense;
-
-      // Use template strings for textContent to avoid syntax errors
-      balanceEl.textContent = formatCurrency(balance);
-      incomeEl.textContent = formatCurrency(income);
-      expenseEl.textContent = formatCurrency(expense);
-
-      // save to localStorage
-      localStorage.setItem('transactions', JSON.stringify(transactions));
-    }
-
-    // simple HTML escape for titles
-    function escapeHtml(str){
-      return String(str).replace(/[&<>"']/g, function (m) {
-        return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m];
-      });
-    }
-
-    // delete handler using event delegation
-    list.addEventListener('click', function(e){
-      const btn = e.target.closest('.delete-btn');
-      if (!btn) return;
-      const idx = Number(btn.dataset.idx);
-      if (!Number.isNaN(idx)) {
-        transactions.splice(idx, 1);
-        updateUI();
-      }
-    });
-
-    // handle new transaction
-    form.addEventListener('submit', function(e){
-      e.preventDefault();
-      const title = titleInput.value.trim();
-      const amount = parseFloat(amountInput.value);
-      const type = typeInput.value;
-
-      if (!title || isNaN(amount) || amount <= 0) {
-        // simple validation: you could show a message here
-        return;
-      }
-
-      transactions.push({ title, amount, type });
-      updateUI();
-      form.reset();
-      titleInput.focus();
-    });
-
-    // initial render
-    updateUI();
-  </script>
+            form.reset();
+        });
+    </script>
 </body>
 </html>
